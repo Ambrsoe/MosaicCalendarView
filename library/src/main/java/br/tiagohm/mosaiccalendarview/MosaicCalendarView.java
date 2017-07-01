@@ -53,6 +53,10 @@ public class MosaicCalendarView extends FrameLayout {
         setWeekTextColor(Color.GRAY);
     }
 
+    public void setOnDateListener(MosaicView.OnDateListener onDateListener) {
+        mMosaicView.setOnDateListener(onDateListener);
+    }
+
     public int getWeekTextColor() {
         return weekTextColor;
     }

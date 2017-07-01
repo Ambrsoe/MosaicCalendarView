@@ -2,10 +2,14 @@ package br.tiagohm.mosaiccalendarview.app;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
 
 import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Locale;
 
 import br.tiagohm.mosaiccalendarview.MosaicCalendarView;
+import br.tiagohm.mosaiccalendarview.MosaicView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,6 +25,12 @@ public class MainActivity extends AppCompatActivity {
         mosaicCalendarView.setDateSpace(2);
         mosaicCalendarView.setWeekTextColor(0xFF767676);
         mosaicCalendarView.setMonthTextColor(0xFF767676);
+        mosaicCalendarView.setOnDateListener(new MosaicView.OnDateListener() {
+            @Override
+            public void onDateClick(Calendar calendar) {
+                Toast.makeText(MainActivity.this, calendar.getTime().toString(), Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private static class DateAdapter extends MosaicCalendarView.Adapter {

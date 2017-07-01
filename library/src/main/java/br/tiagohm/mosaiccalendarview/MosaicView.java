@@ -7,11 +7,13 @@ import android.database.DataSetObserver;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PointF;
 import android.support.annotation.Nullable;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.Calendar;
@@ -30,6 +32,7 @@ public class MosaicView extends View {
             invalidate();
         }
     };
+    private final PointF startPoint = new PointF(), endPoint = new PointF();
     //Usado para desenhar os rótulos dos meses.
     private StaticLayout staticLayout;
     //Largura do dia.
@@ -42,6 +45,8 @@ public class MosaicView extends View {
     private int monthTextColor;
     //Adapter para preencher a cor dos dias e o intervalo de início e fim.
     private Adapter adapter;
+    //Listeners
+    private OnDateListener onDateListener;
 
     public MosaicView(Context context) {
         this(context, null);
@@ -96,6 +101,10 @@ public class MosaicView extends View {
         setDateWidth(40);
         setDateSpace(2);
         setMonthTextColor(Color.GRAY);
+    }
+
+    public void setOnDateListener(OnDateListener onDateListener) {
+        this.onDateListener = onDateListener;
     }
 
     public int getDateWidth() {
@@ -225,6 +234,50 @@ public class MosaicView extends View {
                 }
             }
         }
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        final int action = event.getActionMasked();
+
+        switch (action) {
+            case MotionEvent.ACTION_DOWN:
+                startPoint.x = event.getX();
+                startPoint.y = event.getY();
+                break;
+            case MotionEvent.ACTION_UP:
+                endPoint.x = event.getX();
+                endPoint.y = event.getY();
+                final int offset = getOffsetAt(startPoint.x, startPoint.y);
+                if (offset >= 0 &&
+                        getAdapter() != null &&
+                        offset < getAdapter().getNumberOfDays() &&
+                        offset == getOffsetAt(endPoint.x, endPoint.y)) {
+                    if (onDateListener != null) {
+                        Calendar date = (Calendar) getAdapter().getStartDate().clone();
+                        date.add(Calendar.DATE, offset);
+                        onDateListener.onDateClick(date);
+                    }
+                }
+                break;
+            case MotionEvent.ACTION_CANCEL:
+                break;
+            case MotionEvent.ACTION_MOVE:
+                break;
+        }
+
+        return true;
+    }
+
+    private int getOffsetAt(float x, float y) {
+        final int week = (int) ((x - getPaddingLeft()) / (getDateWidth() + getDateSpace()));
+        final int dayOfWeek = (int) ((y - getPaddingTop()) / (getDateHeight() + getDateSpace())) - 3;
+        return week >= 0 && dayOfWeek >= 0 ? week * 7 + dayOfWeek : -1;
+    }
+
+    public interface OnDateListener {
+
+        void onDateClick(Calendar calendar);
     }
 
     public static abstract class Adapter {
