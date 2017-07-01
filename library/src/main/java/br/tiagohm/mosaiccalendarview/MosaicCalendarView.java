@@ -107,7 +107,7 @@ public class MosaicCalendarView extends FrameLayout {
 
     private void popularOsDiasDaSemana() {
         if (getAdapter() != null) {
-            int dayOfWeek = getAdapter().getStartDate().get(Calendar.DAY_OF_WEEK);
+            int dayOfWeek = getAdapter().getStartDate().get(Calendar.DAY_OF_WEEK) - 1;
             for (int i = 0; i <= 7; i++, dayOfWeek++) {
                 //Texto do rótulo dos dias da semana.
                 mDaysOfWeek[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, mMosaicView.getDateHeight() * 0.7f);
